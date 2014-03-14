@@ -1,7 +1,7 @@
 from flask import Flask, request
 
-from iri import IRI
-from flask_utils import handle_forwarding
+from libcasetext.iri import IRI
+from libcasetext.flask_utils import handle_forwarding
 
 app = Flask(__name__)
 @app.route("/<path:p>", methods=["POST"])

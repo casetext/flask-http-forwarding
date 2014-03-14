@@ -5,7 +5,7 @@ import unittest
 import httpretty
 import socket
 
-from iri import IRI
+from libcasetext.iri import IRI
 from app_fixture import app
 
 test_iri = "/us/judgment/us/1986-06-30/05-179/eng@published#test/2014-01-01/main.xml"

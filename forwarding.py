@@ -24,6 +24,7 @@ def headers(header_dict):
 
 class Unforwardable(Exception): pass
 class MissingHeaders(Exception): pass
+class ResponseError(Exception): pass
 
 def h_list(header):
     """ Convert a comma-separated HTTP header into a Python list. """
@@ -87,16 +88,30 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                                     requests.codes.created,
                                     requests.codes.ok,
                                     requests.codes.no_content):
-            raise Exception()
-    except Exception as e:
-        # dispatch an error message
+            raise ResponseError(resp.status_code, resp.data)
+    except ResponseError as e:
         error_url = b_headers.pop("X-Forward-Errors-To")[0]
+        b_headers["X-Forward-Error-Condition"] = "External"
+        b_headers["X-Forward-Error-Code"] = e.args[0]
+        b_headers["X-Forward-Error-Message"] = e.args[1]
         requests.post(error_url,
                       headers=encode_headers(b_headers),
                       cookies=cookies,
                       allow_redirects=True,
                       timeout=forwarding_timeout,
-                      data=body)
+                      data="")
+    except Exception as e:
+        # dispatch an error message
+        error_url = b_headers.pop("X-Forward-Errors-To")[0]
+        b_headers["X-Forward-Error-Condition"] = "Internal"
+        b_headers["X-Forward-Error-Message"] = str(e)
+        requests.post(error_url,
+                      headers=encode_headers(b_headers),
+                      cookies=cookies,
+                      allow_redirects=True,
+                      timeout=forwarding_timeout,
+                      data="")
+
 
 def parse_headers(in_headers):
     missing_headers = []

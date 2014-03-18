@@ -92,8 +92,8 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
     except ResponseError as e:
         error_url = b_headers.pop("X-Forward-Errors-To")[0]
         b_headers["X-Forward-Error-Condition"] = "External"
-        b_headers["X-Forward-Error-Code"] = e.args[0]
-        b_headers["X-Forward-Error-Message"] = e.args[1]
+        b_headers["X-Forward-Error-Code"] = str(e.args[0])
+        b_headers["X-Forward-Error-Message"] = str(e.args[1])
         requests.post(error_url,
                       headers=encode_headers(b_headers),
                       cookies=cookies,

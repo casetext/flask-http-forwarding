@@ -64,7 +64,6 @@ class TestForwarding(unittest.TestCase):
         self.response_count = 0
         self.error_count = 0
         def callback(request, uri, headers):
-            print request
             self.assertEqual(request.body, test_file)
             for expected_header, value in expected_forwarding_headers.iteritems():
                 self.assertIn(expected_header, request.headers)

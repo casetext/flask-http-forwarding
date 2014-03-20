@@ -1,12 +1,13 @@
 import os
 import re
 import time
-import unittest
 import httpretty
+import unittest
 import socket
 
 from libcasetext.iri import IRI
 from app_fixture import app
+
 
 test_iri = "/us/judgment/us/1986-06-30/05-179/eng@published#test/2014-01-01/main.xml"
 test_transform = "mayer-to-akx"
@@ -65,7 +66,7 @@ class TestForwarding(unittest.TestCase):
         self.error_count = 0
         def callback(request, uri, headers):
             self.assertEqual(request.body, test_file)
-            for expected_header, value in expected_forwarding_headers.iteritems():
+            for expected_header, value in expected_forwarding_headers.items():
                 self.assertIn(expected_header, request.headers)
                 self.assertEqual(request.headers[expected_header], value)
 
@@ -94,7 +95,7 @@ class TestForwarding(unittest.TestCase):
     def test_with_bad_headers(self):
         """ Failing to set any one of the forwarding headers should trigger a 400. """
         for i in range(0, len(test_forwarding_headers)):
-            items = test_forwarding_headers.items()
+            items = list(test_forwarding_headers.items())
             missing_header = items.pop(i)
 
             # we can't not set the Content-Type, so skip that one
@@ -102,7 +103,7 @@ class TestForwarding(unittest.TestCase):
                 continue
 
             shortened_headers = dict(items)
-            for header, value in shortened_headers.iteritems():
+            for header, value in shortened_headers.items():
                 with open(test_xml_file, 'r') as f:
                     r = self.app.post(full_iri, data=f.read(), headers=shortened_headers)
                     self.assertEqual(r.status, "400 Missing header %s" % missing_header[0])

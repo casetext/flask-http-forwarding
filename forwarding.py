@@ -3,7 +3,7 @@ import re
 import copy
 import urlparse
 from threading import Thread
-
+from StringIO import StringIO
 import requests
 
 from errors import error
@@ -83,7 +83,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                                 cookies=cookies,
                                 allow_redirects=True,
                                 timeout=forwarding_timeout,
-                                data=body)
+                                data=StringIO(body.decode("utf-8")))
         if resp.status_code not in (requests.codes.accepted,
                                     requests.codes.created,
                                     requests.codes.ok,

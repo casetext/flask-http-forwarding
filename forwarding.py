@@ -5,10 +5,11 @@ import urlparse
 from threading import Thread
 from StringIO import StringIO
 import requests
+requests.adapters.DEFAULT_RETRIES = 20
 
 from errors import error
 
-forwarding_timeout = 5
+forwarding_timeout = 15
 default_headers = {}
 required_forwarding_headers = [
     "X-Forward-ID",

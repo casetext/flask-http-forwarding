@@ -1,3 +1,5 @@
+import sys
+import traceback
 import string
 import re
 import copy
@@ -84,7 +86,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                                 cookies=cookies,
                                 allow_redirects=True,
                                 timeout=forwarding_timeout,
-                                data=StringIO(body.decode("utf-8")))
+                                data=body)
         if resp.status_code not in (requests.codes.accepted,
                                     requests.codes.created,
                                     requests.codes.ok,
@@ -103,9 +105,11 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                       data="")
     except Exception as e:
         # dispatch an error message
+        msg = "\n".join(str(e), traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1],
+                sys.exc_info()[2]))
         error_url = b_headers.pop("X-Forward-Errors-To")[0]
         b_headers["X-Forward-Error-Condition"] = "Internal"
-        b_headers["X-Forward-Error-Message"] = str(e)
+        b_headers["X-Forward-Error-Message"] = msg
         requests.post(error_url,
                       headers=encode_headers(b_headers),
                       cookies=cookies,

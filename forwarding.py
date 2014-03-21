@@ -3,13 +3,13 @@ import traceback
 import string
 import re
 import copy
-import urlparse
+from urllib.parse import urlparse,urlunparse
 from threading import Thread
-from StringIO import StringIO
+from io import StringIO
 import requests
 requests.adapters.DEFAULT_RETRIES = 20
 
-from errors import error
+from .errors import error
 
 forwarding_timeout = 15
 default_headers = {}
@@ -23,7 +23,7 @@ required_forwarding_headers = [
 ]
 
 def headers(header_dict):
-    return dict(default_headers.items() + header_dict.items())
+    return dict(list(default_headers.items()) + list(header_dict.items()))
 
 class Unforwardable(Exception): pass
 class MissingHeaders(Exception): pass
@@ -34,7 +34,7 @@ def h_list(header):
     obj = re.split(r",\s*", header)
     new_obj = []
     for item in obj:
-        new_obj.append(string.replace(str(item), "%23", ","))
+        new_obj.append(str(item).replace("%23", ","))
     return new_obj
 
 def list_header(obj):
@@ -43,13 +43,13 @@ def list_header(obj):
         return str(obj)
     new_obj = []
     for item in obj:
-        new_obj.append(string.replace(str(item), ",", "%23"))
+        new_obj.append(str(item).replace(",", "%23"))
     return ", ".join(new_obj)
 
 def encode_headers(out_headers):
     """ Convert a dictionary with Python lists into comma-separated HTTP header values. """
     headers = {}
-    for header, value in out_headers.iteritems():
+    for header, value in out_headers.items():
         if value.__class__ in (list, tuple):
             headers[header] = list_header(value)
         else:
@@ -65,8 +65,8 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
     query_params = b_headers["X-Forward-Query-Params"].pop(0)
     method = b_headers["X-Forward-Method"].pop(0).upper()
 
-    scheme, netloc, path, params, old_query, fragment = urlparse.urlparse(url)
-    full_url = urlparse.urlunparse((
+    scheme, netloc, path, params, old_query, fragment = urlparse(url)
+    full_url = urlunparse((
         scheme,
         netloc,
         iri.manifestation_str(),
@@ -77,7 +77,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
 
     b_headers["X-Forward-Referer"] = referer
     b_headers["Content-Type"] = iri.mime_type()
-    full_url = string.replace(full_url, "#", "%23")
+    full_url = full_url.replace("#", "%23")
 
     try:
         resp = requests.request(method,
@@ -105,7 +105,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                       data="")
     except Exception as e:
         # dispatch an error message
-        msg = "\n".join(str(e), traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1],
+        msg = "\n".join(list(str(e)) + traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1],
                 sys.exc_info()[2]))
         error_url = b_headers.pop("X-Forward-Errors-To")[0]
         b_headers["X-Forward-Error-Condition"] = "Internal"

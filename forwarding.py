@@ -78,7 +78,9 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
     b_headers["X-Forward-Referer"] = referer
     b_headers["Content-Type"] = iri.mime_type()
     full_url = full_url.replace("#", "%23")
-
+    
+    if body.__class__ == str:
+        body = body.encode("utf-8")
     try:
         resp = requests.request(method,
                                 full_url,

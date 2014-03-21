@@ -74,7 +74,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
     ))
 
     b_headers["X-Forward-Referer"] = referer
-    b_headers["Content-Type"] = iri.mime_type()
+    b_headers["Content-Type"] = iri.mime_type() 
     full_url = full_url.replace("#", "%23")
 
     try:
@@ -94,7 +94,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
         error_url = b_headers.pop("X-Forward-Errors-To")[0]
         b_headers["X-Forward-Error-Condition"] = "External"
         b_headers["X-Forward-Error-Code"] = str(e.args[0])
-        b_headers["X-Forward-Error-Message"] = e.args[1]
+        b_headers["X-Forward-Error-Message"] = str(e.args[1])
         requests.post(error_url,
                       headers=encode_headers(b_headers),
                       cookies=cookies,
@@ -105,7 +105,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
         # dispatch an error message
         error_url = b_headers.pop("X-Forward-Errors-To")[0]
         b_headers["X-Forward-Error-Condition"] = "Internal"
-        b_headers["X-Forward-Error-Message"] = e
+        b_headers["X-Forward-Error-Message"] = str(e).encode('utf-8')
         requests.post(error_url,
                       headers=encode_headers(b_headers),
                       cookies=cookies,

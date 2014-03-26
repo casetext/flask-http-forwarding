@@ -31,20 +31,24 @@ class ResponseError(Exception): pass
 
 def h_list(header):
     """ Convert a comma-separated HTTP header into a Python list. """
+    if header.__class__ in (list, tuple):
+        return list(obj)
+
     obj = re.split(r",\s*", header)
     new_obj = []
     for item in obj:
-        new_obj.append(str(item).replace("%23", ","))
+        new_obj.append(str(item))
     return new_obj
 
 def list_header(obj):
     """ Convert a Python list into a comma-separated HTTP header. """
     if obj.__class__ not in (list, tuple):
         return str(obj)
+
     new_obj = []
     for item in obj:
-        new_obj.append(str(item).replace(",", "%23"))
-    return ", ".join(new_obj)
+        new_obj.append(str(item))
+    return ",".join(new_obj)
 
 def encode_headers(out_headers):
     """ Convert a dictionary with Python lists into comma-separated HTTP header values. """

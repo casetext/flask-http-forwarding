@@ -101,7 +101,8 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                                     requests.codes.ok,
                                     requests.codes.no_content):
             if resp.status_code==409:
-                fwding_log.debug("409 received for url %s.  Document content: %s" % (full_url, body))
+                fwding_log.debug("409 received for iri %s.  Document content: %s" % (iri.manifestation_str(), 
+                                                                                     body))
             raise ResponseError(resp.status_code, resp.content)
     except ResponseError as e:
         error_url = b_headers.pop("X-Forward-Errors-To")[0]

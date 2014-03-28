@@ -6,10 +6,13 @@ import copy
 from urllib.parse import urlparse,urlunparse
 from threading import Thread
 from io import StringIO
+import logging
 import requests
 requests.adapters.DEFAULT_RETRIES = 20
 
 from .errors import error
+
+fwding_log = logging.getLogger('libcasetext.flask_utils.forwarding')
 
 forwarding_timeout = 15
 default_headers = {}
@@ -93,6 +96,8 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                                     requests.codes.created,
                                     requests.codes.ok,
                                     requests.codes.no_content):
+            if resp.status_code==409:
+                fwding_log.debug("409 received for url %s.  Document content: %s" % (full_url, body))
             raise ResponseError(resp.status_code, resp.content)
     except ResponseError as e:
         error_url = b_headers.pop("X-Forward-Errors-To")[0]

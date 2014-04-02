@@ -17,7 +17,7 @@ fwding_log = logging.getLogger('libcasetext.flask_utils.forwarding')
 forwarding_timeout = 15
 default_headers = {}
 required_forwarding_headers = [
-    "X-Forward-ID",
+    "X-Forward-Id",
     "X-Forward-To",
     "X-Forward-Query-Params",
     "X-Forward-Method",

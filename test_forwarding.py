@@ -19,7 +19,7 @@ full_iri = test_iri + "?transform=%s" % test_transform
 
 test_forwarding_headers = {
     "Content-Type": "text/xml",
-    "X-Forward-ID": "550e8400-e29b-41d4-a716-446655440000",
+    "X-Forward-Id": "550e8400-e29b-41d4-a716-446655440000",
     "X-Forward-To": "http://example.com,http://2example.com",
     "X-Forward-Query-Params": "foo=bar&baz=quux,testing=true",
     "X-Forward-Method": "POST,PUT",
@@ -29,7 +29,7 @@ test_forwarding_headers = {
 
 fail_forwarding_headers = {
     "Content-Type": "text/xml",
-    "X-Forward-ID": "550e8400-e29b-41d4-a716-446655440000",
+    "X-Forward-Id": "550e8400-e29b-41d4-a716-446655440000",
     "X-Forward-To": "http://err-gen.com",
     "X-Forward-Query-Params": "foo=bar&baz=quux",
     "X-Forward-Method": "POST",
@@ -39,7 +39,7 @@ fail_forwarding_headers = {
 
 timeout_forwarding_headers = {
     "Content-Type": "text/xml",
-    "X-Forward-ID": "550e8400-e29b-41d4-a716-446655440000",
+    "X-Forward-Id": "550e8400-e29b-41d4-a716-446655440000",
     "X-Forward-To": "http://timeout.com",
     "X-Forward-Query-Params": "foo=bar&baz=quux",
     "X-Forward-Method": "POST",
@@ -49,7 +49,7 @@ timeout_forwarding_headers = {
 
 expected_forwarding_headers = {
     "Content-Type": "text/xml",
-    "X-Forward-ID": "550e8400-e29b-41d4-a716-446655440000",
+    "X-Forward-Id": "550e8400-e29b-41d4-a716-446655440000",
     "X-Forward-To": "http://2example.com",
     "X-Forward-Query-Params": "testing=true",
     "X-Forward-Method": "PUT",

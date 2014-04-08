@@ -3,6 +3,22 @@ import unittest
 from libcasetext.iri import IRI
 
 class TestIRI(unittest.TestCase):
+    def test_valid_iri_parts(self):
+        """ Passing in valid IRI parts should parse correctly. """
+        test_iri = IRI(country="us",
+                       classification="judgment",
+                       authority="us",
+                       date="2013-01-01",
+                       identifier="hello",
+                       language="eng",
+                       revision="published",
+                       renderer="test",
+                       render_date="2013-05-08",
+                       format_code="xml")
+        self.assertEqual(test_iri.work_str(), "/us/judgment/us/2013-01-01/hello/main")
+        self.assertEqual(test_iri.expression_str(), "/us/judgment/us/2013-01-01/hello/eng@published#test/2013-05-08/main")
+        self.assertEqual(test_iri.manifestation_str(), "/us/judgment/us/2013-01-01/hello/eng@published#test/2013-05-08/main.xml")
+
     def test_valid_work_iri(self):
         """ A valid work IRI should parse correctly. """
         test_iri = IRI("/us/judgment/us/2013-01-01/06-575/main")

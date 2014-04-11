@@ -70,7 +70,7 @@ class TestIRI(unittest.TestCase):
 
     def test_valid_manifestation_iri(self):
         """ A valid manifestation IRI should parse correctly. """
-        test_iri = IRI("/us/judgment/us/2013-01-01/06-575/eng@published#mayer/2014-06-07/part1/section6")
+        test_iri = IRI("/us/judgment/us/2013-01-01/06-575/eng@published#mayer/2014-06-07/part1/section6.xml")
         self.assertEqual(test_iri.work_str(), "/us/judgment/us/2013-01-01/06-575/part1/section6")
         self.assertEqual(test_iri.expression_str(), "/us/judgment/us/2013-01-01/06-575/eng@published#mayer/2014-06-07/part1/section6")
         self.assertEqual(test_iri.country_code, "us")
@@ -87,4 +87,7 @@ class TestIRI(unittest.TestCase):
         self.assertEqual(test_iri.render_date.month, 6)
         self.assertEqual(test_iri.render_date.day, 7)
         self.assertEqual(test_iri.path, "part1/section6")
+        self.assertEqual(test_iri.format_code, "xml")
 
+        test_iri = IRI("/us/judgment/us/2013-01-01/06-575/eng@published#mayer/2014-06-07/part1/section6.htm")
+        self.assertEqual(test_iri.format_code, "htm")

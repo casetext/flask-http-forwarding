@@ -32,6 +32,30 @@ class TestIRI(unittest.TestCase):
         self.assertEqual(test_iri.identifier, "06-575")
         self.assertEqual(test_iri.path, "main")
 
+        """ Now try with a YYYY-MM partial date. """
+        test_iri = IRI("/us/judgment/us/1872-12/83us258/main")
+        self.assertEqual(test_iri.work_str(), "/us/judgment/us/1872-12/83us258/main")
+        self.assertEqual(test_iri.country_code, "us")
+        self.assertEqual(test_iri.classification, "judgment")
+        self.assertEqual(test_iri.authority, "us")
+        self.assertEqual(test_iri.date.year, 1872)
+        self.assertEqual(test_iri.date.month, 12)
+        self.assertEqual(test_iri.date.day, None)
+        self.assertEqual(test_iri.identifier, "83us258")
+        self.assertEqual(test_iri.path, "main")
+
+        """ Now try with a YYYY partial date. """
+        test_iri = IRI("/us/judgment/delsuper/1840/3del86/main")
+        self.assertEqual(test_iri.work_str(), "/us/judgment/delsuper/1840/3del86/main")
+        self.assertEqual(test_iri.country_code, "us")
+        self.assertEqual(test_iri.classification, "judgment")
+        self.assertEqual(test_iri.authority, "delsuper")
+        self.assertEqual(test_iri.date.year, 1840)
+        self.assertEqual(test_iri.date.month, None)
+        self.assertEqual(test_iri.date.day, None)
+        self.assertEqual(test_iri.identifier, "3del86")
+        self.assertEqual(test_iri.path, "main")
+
     def test_valid_expression_iri(self):
         """ A valid expression IRI should parse correctly. """
         test_iri = IRI("/us/judgment/us/2013-01-01/06-575/eng@published/part1/section6")

@@ -3,7 +3,14 @@ import traceback
 import string
 import re
 import copy
-from urllib.parse import urlparse,urlunparse
+
+# We don't support python 2, but attempt to make it work.
+if sys.version_info[0] < 3:
+    from urlparse import urlparse,urlunparse
+    print( "DANGER WILL ROBINSON: You are running python 2, which is unsupported by libcasetext. YMMV." )
+else:
+    from urllib.parse import urlparse,urlunparse
+
 from threading import Thread
 from io import StringIO
 import logging

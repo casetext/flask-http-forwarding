@@ -153,13 +153,14 @@ def parse_headers(in_headers):
     else:
         raise MissingHeaders(missing_headers)
 
-def handle_forwarding(response_body, request, new_iri):
+def handle_forwarding(response_body, request, new_iri, user_headers={}):
     """
     Seamlessly either hand off the response to the next step in the
     forwarding chain, if there is one, or just return it to the client.
     """
 
     try:
+        user_headers = dict(list(user_headers.items()) + list(request.headers.items()))
         # DO NOT BLOCK. Dispatch the forwarding request and move on.
         t = Thread(target=dispatch_forwarding_request,
                    kwargs={
@@ -167,7 +168,7 @@ def handle_forwarding(response_body, request, new_iri):
                        'iri': new_iri,
                        'cookies': request.cookies,
                        'body': response_body,
-                       'b_headers': parse_headers(request.headers)
+                       'b_headers': parse_headers(user_headers)
                    })
         t.start()
         resp = ("",

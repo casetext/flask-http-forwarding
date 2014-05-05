@@ -154,7 +154,7 @@ def parse_headers(in_headers):
         raise MissingHeaders(missing_headers)
 
 def concat_headers(old, new):
-    retval = old
+    retval = dict(old.items())
     for k in new.keys():
         if old.get(k):
             steps = [ s for s in old[k].split(',') if s ]

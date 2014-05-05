@@ -153,12 +153,6 @@ def parse_headers(in_headers):
     else:
         raise MissingHeaders(missing_headers)
 
-def concat_dicts(dict1,dict2):
-    if sys.version_info[0] < 3:
-        return dict(dict1.items() + dict2.items())
-    else:
-        return dict(list(dict1.items()) + list(dict2.items()))
-
 def handle_forwarding(response_body, request, new_iri, user_headers={}):
     """
     Seamlessly either hand off the response to the next step in the
@@ -166,7 +160,7 @@ def handle_forwarding(response_body, request, new_iri, user_headers={}):
     """
 
     try:
-        user_headers = concat_dicts(user_headers, request.headers)
+        user_headers = dict(list(user_headers.items()) + list(request.headers.items()))
         # DO NOT BLOCK. Dispatch the forwarding request and move on.
         t = Thread(target=dispatch_forwarding_request,
                    kwargs={

@@ -153,6 +153,18 @@ def parse_headers(in_headers):
     else:
         raise MissingHeaders(missing_headers)
 
+def concat_headers(old, new):
+    retval = old
+    for k in new.keys():
+        if old.get(k):
+            steps = [ s for s in old[k].split(',') if s ]
+            steps += [ s for s in new[k].split(',') if s ]
+            retval[k] = ','.join(steps)
+        else:
+            retval[k] = new[k]
+
+    return retval
+
 def handle_forwarding(response_body, request, new_iri, user_headers={}):
     """
     Seamlessly either hand off the response to the next step in the
@@ -160,7 +172,7 @@ def handle_forwarding(response_body, request, new_iri, user_headers={}):
     """
 
     try:
-        user_headers = dict(list(user_headers.items()) + list(request.headers.items()))
+        user_headers = concat_headers(request.headers, user_headers)
         # DO NOT BLOCK. Dispatch the forwarding request and move on.
         t = Thread(target=dispatch_forwarding_request,
                    kwargs={

@@ -158,7 +158,10 @@ def concat_headers(old, new):
     for k in new.keys():
         if old.get(k):
             steps = [ s for s in old[k].split(',') if s ]
-            steps += [ s for s in new[k].split(',') if s ]
+            if old[k][-1]==',':
+                steps.append( new[k] )
+            else:
+                steps[-1] += '&%s' % new[k]
             retval[k] = ','.join(steps)
         else:
             retval[k] = new[k]

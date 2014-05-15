@@ -42,7 +42,7 @@ class ResponseError(Exception): pass
 def h_list(header):
     """ Convert a comma-separated HTTP header into a Python list. """
     if header.__class__ in (list, tuple):
-        return list(obj)
+        return list(header)
 
     obj = re.split(r",\s*", header)
     new_obj = []

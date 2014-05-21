@@ -27,6 +27,13 @@ test_forwarding_headers = {
     "X-Forward-Referer": "ORIGIN"
 }
 
+test_unforwardable_headers = {
+    "Content-Type": "application/xml",
+    "X-Forward-Id": "550e8400-e29b-41d4-a716-446655440000",
+    "X-Forward-Errors-To": "http://errors.com",
+    "X-Forward-Referer": "ORIGIN"
+}
+
 fail_forwarding_headers = {
     "Content-Type": "text/xml",
     "X-Forward-Id": "550e8400-e29b-41d4-a716-446655440000",
@@ -87,9 +94,7 @@ class TestForwarding(unittest.TestCase):
         """ Not setting forwarding headers should trigger a 200. """
         full_iri = test_iri + "?transform=%s" % test_transform
         with open(test_xml_file, 'r') as f:
-            r = self.app.post(full_iri, data=f.read(), headers={
-                "Content-Type": "application/xml"
-            })
+            r = self.app.post(full_iri, data=f.read(), headers=test_unforwardable_headers)
             self.assertEqual(r.status_code, 200)
 
     def test_with_bad_headers(self):

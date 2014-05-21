@@ -10,6 +10,7 @@ if sys.version_info[0] < 3:
     print( "DANGER WILL ROBINSON: You are running python 2, which is unsupported by libcasetext. YMMV." )
 else:
     from urllib.parse import urlparse,urlunparse
+    from functools import reduce
 
 from threading import Thread
 from io import StringIO
@@ -23,14 +24,18 @@ fwding_log = logging.getLogger('libcasetext.flask_utils.forwarding')
 
 forwarding_timeout = 15
 default_headers = {}
-required_forwarding_headers = [
-    "X-Forward-Id",
-    "X-Forward-To",
-    "X-Forward-Query-Params",
-    "X-Forward-Method",
-    "X-Forward-Referer",
-    "X-Forward-Errors-To"
-]
+required_forwarding_headers = {
+    'fixed': [
+        "X-Forward-Id",
+        "X-Forward-Referer",
+        "X-Forward-Errors-To"
+        ],
+    'to-forward': [
+        "X-Forward-To",
+        "X-Forward-Query-Params",
+        "X-Forward-Method"
+        ]
+    }
 
 def headers(header_dict):
     return dict(list(default_headers.items()) + list(header_dict.items()))
@@ -140,13 +145,13 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
 def parse_headers(in_headers):
     missing_headers = []
     headers = {}
-    for header in required_forwarding_headers:
+    for header in reduce( lambda a,b: a+b, required_forwarding_headers.values() ):
         if header in in_headers:
             headers[header] = h_list(in_headers[header])
         else:
             missing_headers.append(header)
     # no headers, so we assume it isn't forwardable
-    if len(missing_headers) is len(required_forwarding_headers):
+    if set(missing_headers)==set(required_forwarding_headers['to-forward']):
         raise Unforwardable()
     elif len(missing_headers) is 0:
         return headers

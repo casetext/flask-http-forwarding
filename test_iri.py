@@ -1,4 +1,5 @@
 import unittest
+from nose.tools import raises
 
 from libcasetext.iri import IRI
 
@@ -115,3 +116,9 @@ class TestIRI(unittest.TestCase):
 
         test_iri = IRI("/us/judgment/us/2013-01-01/06-575/eng@published#mayer/2014-06-07/part1/section6.htm")
         self.assertEqual(test_iri.format_code, "htm")
+
+    @raises(Exception)
+    def test_format_code_not_in_work_str(self):
+        """ We should never be parsing the format_code into the path """
+        test_iri = IRI("/us/judgment/us/1938-04-25/640/eng@published#xslt-nozzle-akx-to-json/2014-06-02/main.json")
+

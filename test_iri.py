@@ -121,4 +121,9 @@ class TestIRI(unittest.TestCase):
     def test_format_code_not_in_work_str(self):
         """ We should never be parsing the format_code into the path """
         test_iri = IRI("/us/judgment/us/1938-04-25/640/eng@published#xslt-nozzle-akx-to-json/2014-06-02/main.json")
+        
+    @raises(Exception)
+    def test_format_code_in_work_iri(self):
+        """ A work IRI with a format code and no expression parts is not valid """
+        test_iri = IRI("/us/judgment/1stcir/2010-06-09/09-1900/main.xml")
 

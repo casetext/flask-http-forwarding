@@ -1,0 +1,17 @@
+import logging
+from flask import Response
+
+error_logger = logging.getLogger('libcasetext.flask_utils')
+
+def error(code, message, body=None):
+    errmsg = "%d %s: %s" % (code, message, body) if body else "%d %s" % (code, message)
+    error_logger.error(errmsg)
+
+    if body is None:
+        body = "%s\n" % message
+    return Response(
+        status="%d %s" % (code, message),
+        response=body,
+        mimetype="text/plain",
+        headers={}
+    )

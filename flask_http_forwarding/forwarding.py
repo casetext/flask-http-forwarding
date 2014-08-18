@@ -7,7 +7,7 @@ import copy
 # We don't support python 2, but attempt to make it work.
 if sys.version_info[0] < 3:
     from urlparse import urlparse,urlunparse
-    print( "DANGER WILL ROBINSON: You are running python 2, which is unsupported by libcasetext. YMMV." )
+    print( "DANGER WILL ROBINSON: You are running python 2, which has been deprecated. YMMV." )
 else:
     from urllib.parse import urlparse,urlunparse
     from functools import reduce
@@ -20,7 +20,7 @@ requests.adapters.DEFAULT_RETRIES = 20
 
 from .errors import error
 
-fwding_log = logging.getLogger('libcasetext.flask_utils.forwarding')
+fwding_log = logging.getLogger('Flask-HTTP-Forwarding.forwarding')
 
 forwarding_timeout = 15
 default_headers = {}

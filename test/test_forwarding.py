@@ -5,7 +5,6 @@ import httpretty
 import unittest
 import socket
 
-from libcasetext.iri import IRI
 from app_fixture import app
 
 

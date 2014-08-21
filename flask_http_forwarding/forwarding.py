@@ -4,10 +4,12 @@ import string
 import re
 import copy
 
+from flask import current_app
+
 # We don't support python 2, but attempt to make it work.
 if sys.version_info[0] < 3:
     from urlparse import urlparse,urlunparse
-    print( "DANGER WILL ROBINSON: You are running python 2, which has been deprecated. YMMV." )
+    print( "DANGER WILL ROBINSON: You are running python 2, which is unsupported. YMMV." )
 else:
     from urllib.parse import urlparse,urlunparse
     from functools import reduce
@@ -23,7 +25,6 @@ from .errors import error
 fwding_log = logging.getLogger('Flask-HTTP-Forwarding.forwarding')
 
 forwarding_timeout = 15
-default_headers = {}
 required_forwarding_headers = {
     'fixed': [
         "X-Forward-Id",
@@ -38,6 +39,7 @@ required_forwarding_headers = {
     }
 
 def headers(header_dict):
+    default_headers = current_app.config.get('DEFAULT_HEADERS') or {}
     return dict(list(default_headers.items()) + list(header_dict.items()))
 
 class Unforwardable(Exception): pass

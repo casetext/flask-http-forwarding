@@ -9,12 +9,12 @@ VERSION = MAJOR_VERSION + '-' + os.popen('git log --oneline | wc -l').read().str
 
 INSTALL_REQUIRES = [
     'requests',
-    'httpretty',
     'Flask'
 ]
 
 TESTS_REQUIRE = [
     'nose',
+    'httpretty'
 ]
 
 setup(

@@ -114,11 +114,9 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                                     requests.codes.created,
                                     requests.codes.ok,
                                     requests.codes.no_content):
-            if resp.status_code==409:
-                fwding_log.debug("409 received for iri %s.  Document content: %s" % (iri.manifestation_str(), 
-                                                                                     body))
             raise ResponseError(resp.status_code, resp.content)
     except ResponseError as e:
+        fwding_log.error("%s received: %s" % (resp.status_code, resp.text))
         error_url = b_headers.pop("X-Forward-Errors-To")[0]
         b_headers["X-Forward-Error-Condition"] = "External"
         b_headers["X-Forward-Error-Code"] = str(e.args[0])
@@ -128,7 +126,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                       cookies=cookies,
                       allow_redirects=True,
                       timeout=forwarding_timeout,
-                      data="")
+                      data=resp.text)
     except Exception as e:
         # dispatch an error message
         msg = "\n".join(list(str(e)) + traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1],

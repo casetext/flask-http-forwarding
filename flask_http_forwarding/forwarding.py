@@ -128,6 +128,7 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                       timeout=forwarding_timeout,
                       data=resp.text)
     except Exception as e:
+        fwding_log.error("Unanticipated exception when trying to forward: %s" % str(e))
         # dispatch an error message
         msg = "\n".join(list(str(e)) + traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1],
                 sys.exc_info()[2]))

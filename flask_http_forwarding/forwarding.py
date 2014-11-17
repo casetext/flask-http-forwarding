@@ -24,7 +24,7 @@ from .errors import error
 
 fwding_log = logging.getLogger('Flask-HTTP-Forwarding.forwarding')
 
-forwarding_timeout = 30
+forwarding_timeout = 120
 required_forwarding_headers = {
     'fixed': [
         "X-Forward-Id",

@@ -89,12 +89,17 @@ class TestForwarding(unittest.TestCase):
                                re.compile("errors.com/(.*)$"),
                                body=callback)
 
+    def tearDown(self):
+        httpretty.disable()
+        httpretty.reset()
+
     def test_without_forwarding(self):
         """ Not setting forwarding headers should trigger a 200. """
         full_iri = test_iri + "?transform=%s" % test_transform
         with open(test_xml_file, 'r') as f:
             r = self.app.post(full_iri, data=f.read(), headers=test_unforwardable_headers)
             self.assertEqual(r.status_code, 200)
+
 
     def test_with_bad_headers(self):
         """ Failing to set any one of the forwarding headers should trigger a 400. """
@@ -112,6 +117,7 @@ class TestForwarding(unittest.TestCase):
                     r = self.app.post(full_iri, data=f.read(), headers=shortened_headers)
                     self.assertEqual(r.status, "400 Missing header %s" % missing_header[0])
 
+
     def test_with_valid_forwarding_scheme(self):
         """ With a valid forwarding scheme in place, we should get a 202.
             We should also expect the dummy HTTP server to get hit correctly. """
@@ -122,6 +128,7 @@ class TestForwarding(unittest.TestCase):
             self.assertEqual(self.error_count, 0)
             self.assertEqual(self.response_count, 1)
 
+        
 class TestForwardingErrors(unittest.TestCase):
     def setUp(self):
         self.flask_app_obj = app

@@ -102,6 +102,8 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
     
     if body.__class__ == str and sys.version_info[0]==3:
         body = body.encode("utf-8")
+    elif sys.version_info[0]==2 and body.__class__ == unicode:
+        body = body.encode("utf-8")
     try:
         resp = requests.request(method,
                                 full_url,

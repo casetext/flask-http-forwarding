@@ -1,8 +1,7 @@
 # This is an implicit value, here for clarity
 #--index https://pypi.python.org/simple/
 
-pyaml
-requests==2.2
-Flask==0.10.1
-HTTPretty==0.8
+requests
+Flask
+HTTPretty
 nose

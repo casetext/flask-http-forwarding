@@ -1,7 +1,7 @@
 # This is an implicit value, here for clarity
 #--index https://pypi.python.org/simple/
 
-requests
+requests==2.2
 Flask
 HTTPretty
 nose

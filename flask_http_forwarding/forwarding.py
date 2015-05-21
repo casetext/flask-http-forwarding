@@ -80,6 +80,38 @@ def encode_headers(out_headers):
             del headers[header]
     return headers
 
+def parse_headers(in_headers):
+    missing_headers = []
+    headers = {}
+    for header in reduce( lambda a,b: a+b, required_forwarding_headers.values() ):
+        if header in in_headers:
+            headers[header] = h_list(in_headers[header])
+        else:
+            missing_headers.append(header)
+    # no headers, so we assume it isn't forwardable
+    if set(missing_headers)==set(required_forwarding_headers['to-forward']):
+        raise Unforwardable()
+    elif len(missing_headers) is 0:
+        return headers
+    else:
+        raise MissingHeaders(missing_headers)
+
+def concat_headers(old, new):
+    retval = dict(old.items())
+    for k in new.keys():
+        if old.get(k):
+            steps = [ s for s in old[k].split(',') if s ]
+            if old[k][-1]==',':
+                steps.append( new[k] )
+            else:
+                steps[-1] += '&%s' % new[k]
+            retval[k] = ','.join(steps)
+        else:
+            retval[k] = new[k]
+
+    return retval
+
+
 def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_headers={}):
     """ Dispatch a request to the next server in the forwarding list. """
     url = b_headers["X-Forward-To"].pop(0)
@@ -144,37 +176,6 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                       timeout=forwarding_timeout,
                       data="")
 
-
-def parse_headers(in_headers):
-    missing_headers = []
-    headers = {}
-    for header in reduce( lambda a,b: a+b, required_forwarding_headers.values() ):
-        if header in in_headers:
-            headers[header] = h_list(in_headers[header])
-        else:
-            missing_headers.append(header)
-    # no headers, so we assume it isn't forwardable
-    if set(missing_headers)==set(required_forwarding_headers['to-forward']):
-        raise Unforwardable()
-    elif len(missing_headers) is 0:
-        return headers
-    else:
-        raise MissingHeaders(missing_headers)
-
-def concat_headers(old, new):
-    retval = dict(old.items())
-    for k in new.keys():
-        if old.get(k):
-            steps = [ s for s in old[k].split(',') if s ]
-            if old[k][-1]==',':
-                steps.append( new[k] )
-            else:
-                steps[-1] += '&%s' % new[k]
-            retval[k] = ','.join(steps)
-        else:
-            retval[k] = new[k]
-
-    return retval
 
 def handle_forwarding(response_body, request, new_iri, user_headers={}):
     """

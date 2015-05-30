@@ -28,5 +28,8 @@ def log_errors_without_request_context(headers, iri, message_payload):
     payload = dict(list(fixed_payload.items()) + list(message_payload.items()))
 
     conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    address,port = headers.pop('X-Forward-Errors-To')[0].split(':')
+
+    # temporarily, because of stupid flesichwolf, we have to strip the http off the front of the url.
+    schema, remainder = headers.pop('X-Forward-Errors-To')[0].split('://')
+    address,port = remainder.split(':')
     conn.sendto( json.dumps( payload ).encode('utf-8'), (address,int(port),) )

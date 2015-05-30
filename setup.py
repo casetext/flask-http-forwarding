@@ -4,7 +4,7 @@ import os
 from setuptools import setup, find_packages
 
 EXCLUDE_FROM_PACKAGES = ['test_*',]
-VERSION = "1.0.1"
+VERSION = "1.1.0"
 
 INSTALL_REQUIRES = [
     'requests',

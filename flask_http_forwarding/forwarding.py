@@ -35,8 +35,7 @@ required_forwarding_headers = {
     'to-forward': [
         "X-Forward-To",
         "X-Forward-Query-Params",
-        "X-Forward-Method",
-        "X-Store-Artifact-To"
+        "X-Forward-Method"
         ]
     }
 
@@ -152,57 +151,25 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                                     requests.codes.no_content):
             raise ResponseError(resp.status_code, resp.content)
     except ResponseError as e:
-        fwding_log.error("%s received: %s" % (resp.status_code, resp.text))
-        error_url = b_headers.pop("X-Forward-Errors-To")[0]
-        b_headers["X-Forward-Error-Condition"] = "External"
-        b_headers["X-Forward-Error-Code"] = str(e.args[0])
-        b_headers["X-Forward-Error-Message"] = str(e.args[1])
-        requests.post(error_url,
-                      headers=encode_headers(b_headers),
-                      cookies=cookies,
-                      allow_redirects=True,
-                      timeout=forwarding_timeout,
-                      data=resp.text)
+        message_payload = {
+            "errorType": "External",
+            "errorCode": str(e.args[0]),
+            "errorMessage": str(e.args[1]),
+            "responseText": resp.text
+        }
+        log_errors_without_request_context(b_headers,
+                                           iri,
+                                           message_payload)
     except Exception as e:
-        fwding_log.error("Unanticipated exception when trying to forward: %s" % str(e))
-        # dispatch an error message
-        msg = "\n".join(list(str(e)) + traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1],
-                sys.exc_info()[2]))
-        error_url = b_headers.pop("X-Forward-Errors-To")[0]
-        b_headers["X-Forward-Error-Condition"] = "Internal"
-        b_headers["X-Forward-Error-Message"] = msg
-        requests.post(error_url,
-                      headers=encode_headers(b_headers),
-                      cookies=cookies,
-                      allow_redirects=True,
-                      timeout=forwarding_timeout,
-                      data="")
-
-
-def store_intermediate_artifact(store_loc, iri, body):
-    if store_loc is None:
-        return
-
-    try:
-        scheme, netloc, path, params, old_query, fragment = urlparse(store_loc)
-        full_url = urlunparse((
-            scheme, 
-            netloc, 
-            iri.manifestation_str(), 
-            params, 
-            query_params,
-            ""
-        )).replace('#','%23')
-        
-        resp = requests.put(full_url, data=body.encode('utf-8'))
-
-        if resp.status_code not in (requests.codes.accepted,
-                                    requests.codes.created,
-                                    requests.codes.ok,
-                                    requests.codes.no_content):
-            raise ResponseError(resp.status_code, resp.content)
-    except ResponseError as e:
-        log_errors_without_request_context( headers, iri, str(e) )
+        trace = "\n".join(list(str(e)) + traceback.format_exception(sys.exc_info()[0], sys.exc_info()[1],
+                                                                    sys.exc_info()[2]))
+        message_payload = {
+            "errorType": "Internal",
+            "errorMessage": trace
+        }
+        log_errors_without_request_context(b_headers,
+                                           iri,
+                                           message_payload)
 
 
 def handle_forwarding(response_body, request, new_iri, user_headers={}):

@@ -16,15 +16,17 @@ def error(code, message, body=None):
         headers={}
     )
 
-def log_errors_without_request_context(headers, iri, message):
-    payload = {
-        'id': headers['X-Forward-Id'],
+def log_errors_without_request_context(headers, iri, message_payload):
+    fixed_payload = {
+        'id': headers.pop('X-Forward-Id')[0],
         'iri': iri.manifestation_str(),
-        'message': message,
         'levelname': 'ERROR',
         'filename': __file__,
         'host': socket.gethostbyname( socket.gethostname() )
     }
 
-    conn = socket.connect( headers['X-Forward-Errors-To'] )
-    socket.sendall( json.dumps( payload ) )
+    payload = dict(list(fixed_payload.items()) + list(message_payload.items()))
+
+    conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    address,port = headers.pop('X-Forward-Errors-To')[0].split(':')
+    conn.sendto( json.dumps( payload ).encode('utf-8'), (address,int(port),) )

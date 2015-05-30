@@ -14,13 +14,14 @@ else:
     from urllib.parse import urlparse,urlunparse
     from functools import reduce
 
-from threading import Thread
+#from threading import Thread
+import threading
 from io import StringIO
 import logging
 import requests
 requests.adapters.DEFAULT_RETRIES = 20
 
-from .errors import error
+from .errors import error, log_errors_without_request_context
 
 fwding_log = logging.getLogger('Flask-HTTP-Forwarding.forwarding')
 
@@ -34,7 +35,8 @@ required_forwarding_headers = {
     'to-forward': [
         "X-Forward-To",
         "X-Forward-Query-Params",
-        "X-Forward-Method"
+        "X-Forward-Method",
+        "X-Store-Artifact-To"
         ]
     }
 
@@ -177,6 +179,32 @@ def dispatch_forwarding_request(iri=None, referer="", cookies={}, body="", b_hea
                       data="")
 
 
+def store_intermediate_artifact(store_loc, iri, body):
+    if store_loc is None:
+        return
+
+    try:
+        scheme, netloc, path, params, old_query, fragment = urlparse(store_loc)
+        full_url = urlunparse((
+            scheme, 
+            netloc, 
+            iri.manifestation_str(), 
+            params, 
+            query_params,
+            ""
+        )).replace('#','%23')
+        
+        resp = requests.put(full_url, data=body.encode('utf-8'))
+
+        if resp.status_code not in (requests.codes.accepted,
+                                    requests.codes.created,
+                                    requests.codes.ok,
+                                    requests.codes.no_content):
+            raise ResponseError(resp.status_code, resp.content)
+    except ResponseError as e:
+        log_errors_without_request_context( headers, iri, str(e) )
+
+
 def handle_forwarding(response_body, request, new_iri, user_headers={}):
     """
     Seamlessly either hand off the response to the next step in the
@@ -186,7 +214,7 @@ def handle_forwarding(response_body, request, new_iri, user_headers={}):
     try:
         user_headers = concat_headers(request.headers, user_headers)
         # DO NOT BLOCK. Dispatch the forwarding request and move on.
-        t = Thread(target=dispatch_forwarding_request,
+        t = threading.Thread(target=dispatch_forwarding_request,
                    kwargs={
                        'referer': request.url,
                        'iri': new_iri,

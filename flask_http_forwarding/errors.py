@@ -1,4 +1,4 @@
-import logging
+import logging, socket, json
 from flask import Response
 
 error_logger = logging.getLogger('Flask-HTTP-Forwarding.errors')
@@ -15,3 +15,16 @@ def error(code, message, body=None):
         mimetype="text/plain",
         headers={}
     )
+
+def log_errors_without_request_context(headers, iri, message):
+    payload = {
+        'id': headers['X-Forward-Id'],
+        'iri': iri.manifestation_str(),
+        'message': message,
+        'levelname': 'ERROR',
+        'filename': __file__,
+        'host': socket.gethostbyname( socket.gethostname() )
+    }
+
+    conn = socket.connect( headers['X-Forward-Errors-To'] )
+    socket.sendall( json.dumps( payload ) )
